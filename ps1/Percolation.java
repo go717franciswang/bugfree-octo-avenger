@@ -2,6 +2,7 @@ public class Percolation {
     private int N;
     private boolean[][] siteOpen;
     private WeightedQuickUnionUF uf;
+    private WeightedQuickUnionUF ufFull;
     private int topRoot = -1;
     private int bottomRoot = -1;
     
@@ -16,6 +17,7 @@ public class Percolation {
         }
         
         uf = new WeightedQuickUnionUF(N*N);
+        ufFull = new WeightedQuickUnionUF(N*N);
     }
     
     public void open(int i, int j) {
@@ -28,6 +30,7 @@ public class Percolation {
                 topRoot = getUFid(i, j);
             } else {
                 uf.union(topRoot, getUFid(i, j));
+                ufFull.union(topRoot, getUFid(i, j));
             }
         }
         
@@ -41,18 +44,22 @@ public class Percolation {
         
         if (i > 1 && isOpen(i-1, j)) {
             uf.union(getUFid(i-1, j), getUFid(i, j));
+            ufFull.union(getUFid(i-1, j), getUFid(i, j));
         }
         
         if (i < N && isOpen(i+1, j)) {
             uf.union(getUFid(i+1, j), getUFid(i, j));
+            ufFull.union(getUFid(i+1, j), getUFid(i, j));
         }
         
         if (j > 1 && isOpen(i, j-1)) {
             uf.union(getUFid(i, j-1), getUFid(i, j));
+            ufFull.union(getUFid(i, j-1), getUFid(i, j));
         }
         
         if (j < N && isOpen(i, j+1)) {
             uf.union(getUFid(i, j+1), getUFid(i, j));
+            ufFull.union(getUFid(i, j+1), getUFid(i, j));
         }
     }
     
@@ -72,7 +79,7 @@ public class Percolation {
             return false;
         }
         
-        return isOpen(i, j) && uf.connected(topRoot, getUFid(i, j));
+        return isOpen(i, j) && ufFull.connected(topRoot, getUFid(i, j));
     }
     
     public boolean percolates() {
