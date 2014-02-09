@@ -56,8 +56,6 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             a[sampleId] = null;
         }
         
-        sampleId = -1;
-        
         return item;
     }
     
@@ -66,9 +64,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             throw new java.util.NoSuchElementException();
         }
         
-        if (sampleId == -1) {
-            sampleId = StdRandom.uniform(0, N);
-        }
+        sampleId = StdRandom.uniform(0, N);
         
         return a[sampleId];
     }
