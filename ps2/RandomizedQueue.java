@@ -20,6 +20,10 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
     
     public void enqueue(Item item) {
+        if (item == null) {
+            throw new NullPointerException();
+        }
+        
         if (a.length == N) {
             resize(N*2);
         }
@@ -51,8 +55,6 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         } else {
             a[sampleId] = null;
         }
-        
-        StdOut.println("sampleId: " + sampleId + ", N: " + N);
         
         sampleId = -1;
         
