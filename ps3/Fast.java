@@ -10,15 +10,21 @@ public class Fast {
         Point[] points = new Point[lineCount];
         StdDraw.setXscale(0, 32768);
         StdDraw.setYscale(0, 32768);
+        int i = 0;
         
-        for (int i = 0; i < lineCount; i++) {
+        while (!f.isEmpty()) {
             line = f.readLine().trim();
-            String[] parts = line.split(" +");
+            if (line.equals("")) {
+                continue;
+            }
+            
+            String[] parts = line.split("\\s+");
             int x = Integer.parseInt(parts[0]);
             int y = Integer.parseInt(parts[1]);
             
             points[i] = new Point(x, y);
             points[i].draw();
+            i++;
         }
         
         Arrays.sort(points);

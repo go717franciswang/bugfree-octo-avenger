@@ -1,6 +1,6 @@
 import java.util.Arrays;
 
-public class Brute {
+public class Brute {    
     public static void main(String[] args) {
         In f = new In(args[0]);
         String line;
@@ -10,20 +10,26 @@ public class Brute {
         Point[] points = new Point[lineCount];
         StdDraw.setXscale(0, 32768);
         StdDraw.setYscale(0, 32768);
+        int i = 0;
         
-        for (int i = 0; i < lineCount; i++) {
+        while (!f.isEmpty()) {
             line = f.readLine().trim();
+            if (line.equals("")) {
+                continue;
+            }
+            
             String[] parts = line.split("\\s+");
             int x = Integer.parseInt(parts[0]);
             int y = Integer.parseInt(parts[1]);
             
             points[i] = new Point(x, y);
             points[i].draw();
+            i++;
         }
         
         Arrays.sort(points);
         
-        for (int i = 0; i < points.length; i++) {
+        for (i = 0; i < points.length; i++) {
             Point a = points[i];
             for (int j = i+1; j < points.length; j++) {
                 Point b = points[j];
