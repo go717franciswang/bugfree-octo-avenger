@@ -17,7 +17,10 @@ checkstyle-algs4 HelloWorld.java
 findbugs-algs4 HelloWorld.class
 ```
 
+### [Test files]
+
 ## TODO
 * [ ] There exists a faster and more memory efficient algo for ps1. It was discussed in the [discussion forum].
 
 [discussion forum]: https://class.coursera.org/algs4partI-004/forum/thread?thread_id=150
+[Test files]: ftp://ftp.cs.princeton.edu/pub/cs226/
