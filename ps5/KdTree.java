@@ -33,19 +33,23 @@ public class KdTree {
     
     private Node insert(Node node, Point2D p, boolean useX) {
         if (node == null) return new Node(p);
+        
+        Point2D p1 = node.point;
         if (useX) {
-            if (node.point.x() < p.x()) {
-                return insert(node.left, p, !useX);
+            if (p.x() < p1.x()) {
+                node.left = insert(node.left, p, !useX);
+            } else {            
+                node.right = insert(node.right, p, !useX);
             }
-            
-            return insert(node.right, p, !useX);
+        } else {
+            if (p.y() < p1.y()) {
+                node.left = insert(node.left, p, !useX);    
+            } else {
+                node.right = insert(node.right, p, !useX);
+            }
         }
         
-        if (node.point.y() < p.y()) {
-            return insert(node.left, p, !useX);
-        }
-        
-        return insert(node.right, p, !useX);
+        return node;
     }
     
     public boolean contains(Point2D p) {
@@ -70,16 +74,26 @@ public class KdTree {
         return contains(node.right, p, !useX);
     }
     
-    public void draw() {
-        Queue<Node> q = new Queue<Node>();
-        q.enqueue(root);
-        while (!q.isEmpty()) {
-            Node node = q.dequeue();
-            if (node == null) continue;
-            
-            node.point.draw();
-            q.enqueue(node.left);
-            q.enqueue(node.right);
+    public void draw() {        
+        draw(root, true, 0, 0, 1, 1);
+    }
+    
+    private void draw(Node node, boolean useX, 
+                      double xmin, double ymin, double xmax, double ymax) {
+        if (node == null) return;
+        Point2D p = node.point;
+        p.draw();
+        StdOut.println(xmin + ", " + ymin + ", " + xmax + ", " + ymax);
+        if (useX) {
+            StdDraw.setPenColor(StdDraw.RED);
+            StdDraw.line(p.x(), ymin, p.x(), ymax);
+            draw(node.left, !useX, xmin, ymin, p.x(), ymax);
+            draw(node.right, !useX, p.x(), ymin, xmax, ymax);
+        } else {
+            StdDraw.setPenColor(StdDraw.BLUE);
+            StdDraw.line(xmin, p.y(), xmax, p.y());
+            draw(node.left, !useX, xmin, ymin, xmax, p.y());
+            draw(node.right, !useX, xmin, p.y(), xmax, ymax);
         }
     }
     
