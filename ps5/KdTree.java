@@ -139,7 +139,7 @@ public class KdTree {
         Point2D best = p1;
         
         if (useX) {
-            if (p.x() < node.point.x()) {
+            if (p.x() < p1.x()) {
                 RectHV rect = new RectHV(xmin, ymin, p1.x(), ymax);
                 if (rect.distanceSquaredTo(p) < shortest) {
                     Point2D p2 = nearest(node.left, p, !useX, xmin, ymin, p1.x(), ymax);
@@ -189,7 +189,7 @@ public class KdTree {
                 }
             }
         } else {
-            if (p.y() < node.point.y()) {
+            if (p.y() < p1.y()) {
                 RectHV rect = new RectHV(xmin, ymin, xmax, p1.y());
                 if (rect.distanceSquaredTo(p) < shortest) {
                     Point2D p2 = nearest(node.left, p, !useX, xmin, ymin, xmax, p1.y());
