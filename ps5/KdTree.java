@@ -35,6 +35,13 @@ public class KdTree {
         if (node == null) return new Node(p);
         
         Point2D p1 = node.point;
+        if (p1.equals(p)) {
+            // looks like the assignment does not allow the same key
+            // so offset the later increase in size 
+            size--;
+            return node;
+        }
+        
         if (useX) {
             if (p.x() < p1.x()) {
                 node.left = insert(node.left, p, !useX);
@@ -58,20 +65,14 @@ public class KdTree {
     
     private boolean contains(Node node, Point2D p, boolean useX) {
         if (node == null) return false;
-        if (node.point == p) return true;
-        if (useX) {
-            if (node.point.x() < p.x()) {
-                return contains(node.left, p, !useX);
-            }
-            
+        
+        Point2D p2 = node.point;
+        if (p2.equals(p)) return true;
+        if (useX && p.x() < p2.x() || !useX && p.y() < p2.y()) {
+            return contains(node.left, p, !useX);
+        } else {           
             return contains(node.right, p, !useX);
         }
-        
-        if (node.point.y() < p.y()) {
-            return contains(node.left, p, !useX);
-        }
-        
-        return contains(node.right, p, !useX);
     }
     
     public void draw() {        
