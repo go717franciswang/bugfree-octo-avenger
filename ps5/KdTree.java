@@ -1,9 +1,9 @@
 import java.util.TreeSet;
 
-public class PointSET {
+public class KdTree {
     private TreeSet<Point2D> tree;
     
-    public PointSET() {
+    public KdTree() {
         tree = new TreeSet<Point2D>();
     }
     
