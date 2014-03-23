@@ -4,6 +4,7 @@ import java.util.Collections;
 
 class WordNet {
     private Hashtable<String, Integer> noun2Id;
+    private int lastSynsetId;
     private String[] id2Noun;
     private Digraph G;
     private SAP S;
@@ -13,27 +14,36 @@ class WordNet {
         
         In in = new In(synsets);
         while (!in.isEmpty()) {
-            String s = in.readLine();
-            String[] fields = s.split(",");
-            int id = Integer.parseInt(fields[0]);
-            String synset = fields[1];
-            noun2Id.put(synset, id);
+            String s = in.readLine().trim();
+            if (s.length() > 0) {
+                String[] fields = s.split(",");
+                int id = Integer.parseInt(fields[0]);
+                lastSynsetId = id;
+                String[] synset = fields[1].split(" ");
+                for (int i=0; i<synset.length; i++) {
+                    noun2Id.put(synset[i], id);
+                }
+            }
         }
         
-        G = new Digraph(noun2Id.size());
+        G = new Digraph(lastSynsetId+1);
         
         in = new In(hypernyms);
         while (!in.isEmpty()) {
-            String s = in.readLine();
-            String[] fields = s.split(",");
-            int from = Integer.parseInt(fields[0]);
-            int to = Integer.parseInt(fields[1]);
-            G.addEdge(from, to);
+            String s = in.readLine().trim();
+            if (s.length() > 0) {
+                String[] fields = s.split(",");
+                int from = Integer.parseInt(fields[0]);
+                for (int i=1; i<fields.length; i++) {
+                    int to = Integer.parseInt(fields[i]);
+                    G.addEdge(from, to);
+                }
+            }
         }
         
         S = new SAP(G);
         
-        String[] id2Noun = new String[noun2Id.size()];
+        String[] id2Noun = new String[lastSynsetId+1];
         for (String noun : this.nouns()) {
             id2Noun[noun2Id.get(noun)] = noun;
         }
