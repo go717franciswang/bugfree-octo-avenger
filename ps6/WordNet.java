@@ -1,16 +1,18 @@
 import java.util.Hashtable;
 import java.util.Enumeration;
 import java.util.Collections;
+import java.util.ArrayList;
 
 class WordNet {
-    private Hashtable<String, Integer> noun2Id;
+    private Hashtable<String, Queue<Integer>> noun2Ids;
     private int lastSynsetId;
-    private String[] id2Noun;
+    private ArrayList<String> id2Synset;
     private Digraph G;
     private SAP S;
     
     public WordNet(String synsets, String hypernyms) {
-        noun2Id = new Hashtable<String, Integer>();
+        noun2Ids = new Hashtable<String, Queue<Integer>>();
+        id2Synset = new ArrayList<String>();
         
         In in = new In(synsets);
         while (!in.isEmpty()) {
@@ -19,9 +21,15 @@ class WordNet {
                 String[] fields = s.split(",");
                 int id = Integer.parseInt(fields[0]);
                 lastSynsetId = id;
+                id2Synset.add(fields[1]);
                 String[] synset = fields[1].split(" ");
                 for (int i=0; i<synset.length; i++) {
-                    noun2Id.put(synset[i], id);
+                    String noun = synset[i];
+                    if (noun2Ids.get(noun) == null) {
+                        noun2Ids.put(noun, new Queue<Integer>());
+                    }
+                    
+                    noun2Ids.get(noun).enqueue(id);
                 }
             }
         }
@@ -42,27 +50,22 @@ class WordNet {
         }
         
         S = new SAP(G);
-        
-        String[] id2Noun = new String[lastSynsetId+1];
-        for (String noun : this.nouns()) {
-            id2Noun[noun2Id.get(noun)] = noun;
-        }
     }
     
     public Iterable<String> nouns() {
-        return Collections.list(noun2Id.keys());
+        return Collections.list(noun2Ids.keys());
     }
     
     public boolean isNoun(String word) {
-        return noun2Id.containsKey(word);
+        return noun2Ids.containsKey(word);
     }
     
     public int distance(String nounA, String nounB) {
-        return S.length(noun2Id.get(nounA), noun2Id.get(nounB));
+        return S.length(noun2Ids.get(nounA), noun2Ids.get(nounB));
     }
     
     public String sap(String nounA, String nounB) {
-        return id2Noun[S.ancestor(noun2Id.get(nounA), noun2Id.get(nounB))];
+        return id2Synset.get(S.ancestor(noun2Ids.get(nounA), noun2Ids.get(nounB)));
     }
     
     public static void main(String[] args) {

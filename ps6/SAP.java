@@ -35,6 +35,18 @@ class SAP {
         Queue<Integer> check = new Queue<Integer>();
         
         for (int v0 : v) {
+            for (int w0 : w) {
+                if (v0 == w0) {
+                    if (getLength) {
+                        return 0;
+                    } else {
+                        return v0;
+                    }
+                }
+            }
+        }
+        
+        for (int v0 : v) {
             groupIds[v0] = 1;
             pathTo[v0] = 0;
             edgeTo[v0] = v0;
