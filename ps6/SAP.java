@@ -6,21 +6,17 @@ class SAP {
     }
     
     public int length(int v, int w) {
-        Queue<Integer> q1 = new Queue<Integer>();
-        Queue<Integer> q2 = new Queue<Integer>();
-        q1.enqueue(v);
-        q2.enqueue(w);
-        
-        return bfs(q1, q2, true);
+        return length(getIter(v), getIter(w));
     }
     
     public int ancestor(int v, int w) {
-        Queue<Integer> q1 = new Queue<Integer>();
-        Queue<Integer> q2 = new Queue<Integer>();
-        q1.enqueue(v);
-        q2.enqueue(w);
-        
-        return bfs(q1, q2, false);
+        return ancestor(getIter(v), getIter(w));
+    }
+    
+    private Iterable<Integer> getIter(int v) {
+        Queue<Integer> q = new Queue<Integer>();
+        q.enqueue(v);
+        return q;
     }
     
     public int length(Iterable<Integer> v, Iterable<Integer> w) {
