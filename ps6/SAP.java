@@ -2,7 +2,7 @@ public class SAP {
     private Digraph G;
     
     public SAP(Digraph G) {
-        this.G = G;
+        this.G = new Digraph(G);
     }
     
     public int length(int v, int w) {
