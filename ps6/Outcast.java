@@ -1,4 +1,4 @@
-class Outcast {
+public class Outcast {
     private WordNet wordnet;
     
     public Outcast(WordNet wordnet) {

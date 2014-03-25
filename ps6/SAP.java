@@ -1,4 +1,4 @@
-class SAP {
+public class SAP {
     private Digraph G;
     
     public SAP(Digraph G) {

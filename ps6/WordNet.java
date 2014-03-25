@@ -3,7 +3,7 @@ import java.util.Enumeration;
 import java.util.Collections;
 import java.util.ArrayList;
 
-class WordNet {
+public class WordNet {
     private Hashtable<String, Queue<Integer>> noun2Ids;
     private int lastSynsetId;
     private ArrayList<String> id2Synset;
