@@ -28,59 +28,72 @@ public class SAP {
     }
     
     private int bfs(Iterable<Integer> v, Iterable<Integer> w, boolean getLength) {
-        int[] groupIds = new int[G.V()];
-        java.util.Arrays.fill(groupIds, 0);
-        int[] pathTo = new int[G.V()];
-        int[] edgeTo = new int[G.V()];
-        Queue<Integer> check = new Queue<Integer>();
+        int[] pathToV = new int[G.V()];
+        int[] pathToW = new int[G.V()];
+        java.util.Arrays.fill(pathToV, -1);
+        java.util.Arrays.fill(pathToW, -1);
+        Queue<Integer> checkV = new Queue<Integer>();
+        Queue<Integer> checkW = new Queue<Integer>();
         
         for (int v0 : v) {
-            for (int w0 : w) {
-                if (v0 == w0) {
-                    if (getLength) {
-                        return 0;
-                    } else {
-                        return v0;
-                    }
-                }
-            }
-        }
-        
-        for (int v0 : v) {
-            groupIds[v0] = 1;
-            pathTo[v0] = 0;
-            edgeTo[v0] = v0;
-            check.enqueue(v0);
+            pathToV[v0] = 0;
+            checkV.enqueue(v0);
         }
         
         for (int w0 : w) {
-            groupIds[w0] = -1;
-            pathTo[w0] = 0;
-            edgeTo[w0] = w0;
-            check.enqueue(w0);
+            pathToW[w0] = 0;
+            checkW.enqueue(w0);
         }
         
-        while (!check.isEmpty()) {
-            int x = check.dequeue();
-            int xgroupId = groupIds[edgeTo[x]];
+        int ancestor = -1;
+        int shortestPath = -1;
+        int iterations = 0;
+        
+        while (!checkV.isEmpty() || !checkW.isEmpty()) {
+            Queue<Integer> newCheckV = new Queue<Integer>();
+            Queue<Integer> newCheckW = new Queue<Integer>();
             
-            for (int y : G.adj(x)) {
-                if (groupIds[y] == 0) {
-                    check.enqueue(y);
-                    edgeTo[y] = x;
-                    groupIds[y] = xgroupId;
-                    pathTo[y] = pathTo[x] + 1;
-                } else if (groupIds[y] == -xgroupId) {
-                    if (getLength) {
-                        return pathTo[x] + pathTo[y] + 1;
-                    } else {
-                        return y;
+            for (int x : checkV) {
+                if (pathToW[x] != -1 && (shortestPath == -1 || pathToV[x] + pathToW[x] < shortestPath)) {
+                    shortestPath = pathToV[x] + pathToW[x];
+                    ancestor = x;
+                }
+                
+                for (int y : G.adj(x)) {
+                    if (pathToV[y] == -1) {
+                        pathToV[y] = pathToV[x] + 1;
+                        newCheckV.enqueue(y);
                     }
                 }
             }
+            
+            for (int x : checkW) {
+                if (pathToV[x] != -1 && (shortestPath == -1 || pathToV[x] + pathToW[x] < shortestPath)) {
+                    shortestPath = pathToV[x] + pathToW[x];
+                    ancestor = x;
+                }
+                
+                for (int y : G.adj(x)) {
+                    if (pathToW[y] == -1) {
+                        pathToW[y] = pathToW[x] + 1;
+                        newCheckW.enqueue(y);
+                    }
+                }
+            }
+            
+            checkV = newCheckV;
+            checkW = newCheckW;
+            iterations++;
+            if (shortestPath != -1 && shortestPath <= iterations) {
+                break;
+            }
         }
         
-        return -1;
+        if (getLength) {
+            return shortestPath;
+        } else {
+            return ancestor;
+        }
     }
     
     public static void main(String[] args) {
