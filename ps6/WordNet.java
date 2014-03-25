@@ -49,8 +49,37 @@ public class WordNet {
             }
         }
         
+        if (isCyclic(G)) {
+            throw new IllegalArgumentException();
+        }
+        
         S = new SAP(G);
     }
+    
+    private boolean isCyclic(Digraph G) {
+        boolean[] discovered = new boolean[G.V()];
+        java.util.Arrays.fill(discovered, false);
+        for (int synsetId = 0; synsetId <= lastSynsetId; synsetId++) {
+            if (!discovered[synsetId]) {
+                Queue<Integer> check = new Queue<Integer>();
+                check.enqueue(synsetId);
+                
+                while (!check.isEmpty()) {
+                    int x = check.dequeue();
+                    for (int y : G.adj(x)) {
+                        if (discovered[y]) {
+                            return true;
+                        } else {
+                            discovered[y] = false;
+                            check.enqueue(y);
+                        }
+                    }
+                }
+            }
+        }
+        
+        return false;
+    } 
     
     public Iterable<String> nouns() {
         return Collections.list(noun2Ids.keys());
