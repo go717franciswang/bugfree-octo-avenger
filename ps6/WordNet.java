@@ -61,10 +61,18 @@ public class WordNet {
     }
     
     public int distance(String nounA, String nounB) {
+        checkNouns(nounA, nounB);
         return S.length(noun2Ids.get(nounA), noun2Ids.get(nounB));
     }
     
+    private void checkNouns(String nounA, String nounB) {
+        if (!isNoun(nounA) || !isNoun(nounB)) {
+            throw new java.lang.NullPointerException();
+        }
+    }
+    
     public String sap(String nounA, String nounB) {
+        checkNouns(nounA, nounB);
         return id2Synset.get(S.ancestor(noun2Ids.get(nounA), noun2Ids.get(nounB)));
     }
     
