@@ -50,55 +50,51 @@ public class WordNet {
             }
         }
         
-        if (!isRootedDAG(G)) {
-            throw new IllegalArgumentException();
-        }
-        
+        assertRootedDAG(G);        
         S = new SAP(G);
     }
     
-    private boolean isRootedDAG(Digraph G) {
+    private void dfs(int x, boolean[] discovered, Digraph G, Stack<Integer> ordering) {
+        discovered[x] = true;
+        if (!G.adj(x).iterator().hasNext()) {
+            if (root == -1) {
+                root = x;
+            } else if (root != x) {
+                throw new IllegalArgumentException("Ambiguous root");
+            }
+        } else {
+            for (int y : G.adj(x)) {
+                if (!discovered[y]) {
+                    dfs(y, discovered, G, ordering);
+                }
+            }
+        }
+        
+        ordering.push(x);
+    }
+    
+    private void assertRootedDAG(Digraph G) {
         boolean[] discovered = new boolean[G.V()];
         java.util.Arrays.fill(discovered, false);
+        Stack<Integer> ordering = new Stack<Integer>();
         root = -1;
         int steps = 0;
         
         for (int synsetId = 0; synsetId <= lastSynsetId; synsetId++) {
             if (!discovered[synsetId]) {
-                discovered[synsetId] = true;
-                Queue<Integer> check = new Queue<Integer>();
-                check.enqueue(synsetId);
-                
-                while (!check.isEmpty()) {
-                    int x = check.dequeue();
-                    boolean isRoot = true;
-                    steps++;
-                    
-                    for (int y : G.adj(x)) {
-                        isRoot = false;
-                        
-                        if (!discovered[y]) {
-                            discovered[y] = true;
-                            check.enqueue(y);
-                        }
-                    }
-                    
-                    if (isRoot) {
-                        if (root == -1) {
-                            root = x;
-                        } else if (root != x) {
-                            return false;
-                        }
-                    }
-                    
-                    if (steps > G.E()) {
-                        return false;
-                    }
-                }
+                dfs(synsetId, discovered, G, ordering);
             }
         }
         
-        return true;
+        java.util.Arrays.fill(discovered, false);
+        for (int x : ordering) {
+            discovered[x] = true;
+            for (int y : G.adj(x)) {
+                if (discovered[y]) {
+                    throw new IllegalArgumentException("Invalid topological ordering");
+                }
+            }
+        }
     }
     
     public Iterable<String> nouns() {
@@ -116,7 +112,7 @@ public class WordNet {
     
     private void checkNouns(String nounA, String nounB) {
         if (!isNoun(nounA) || !isNoun(nounB)) {
-            throw new java.lang.NullPointerException();
+            throw new IllegalArgumentException("Bad noun");
         }
     }
     
