@@ -9,6 +9,7 @@ public class WordNet {
     private ArrayList<String> id2Synset;
     private Digraph G;
     private SAP S;
+    private int root;
     
     public WordNet(String synsets, String hypernyms) {
         noun2Ids = new Hashtable<String, Queue<Integer>>();
@@ -49,37 +50,56 @@ public class WordNet {
             }
         }
         
-        if (isCyclic(G)) {
+        if (!isRootedDAG(G)) {
             throw new IllegalArgumentException();
         }
         
         S = new SAP(G);
     }
     
-    private boolean isCyclic(Digraph G) {
+    private boolean isRootedDAG(Digraph G) {
         boolean[] discovered = new boolean[G.V()];
         java.util.Arrays.fill(discovered, false);
+        root = -1;
+        int steps = 0;
+        
         for (int synsetId = 0; synsetId <= lastSynsetId; synsetId++) {
             if (!discovered[synsetId]) {
+                discovered[synsetId] = true;
                 Queue<Integer> check = new Queue<Integer>();
                 check.enqueue(synsetId);
                 
                 while (!check.isEmpty()) {
                     int x = check.dequeue();
+                    boolean isRoot = true;
+                    steps++;
+                    
                     for (int y : G.adj(x)) {
-                        if (discovered[y]) {
-                            return true;
-                        } else {
-                            discovered[y] = false;
+                        isRoot = false;
+                        
+                        if (!discovered[y]) {
+                            discovered[y] = true;
                             check.enqueue(y);
                         }
+                    }
+                    
+                    if (isRoot) {
+                        if (root == -1) {
+                            root = x;
+                        } else if (root != x) {
+                            return false;
+                        }
+                    }
+                    
+                    if (steps > G.E()) {
+                        return false;
                     }
                 }
             }
         }
         
-        return false;
-    } 
+        return true;
+    }
     
     public Iterable<String> nouns() {
         return Collections.list(noun2Ids.keys());
