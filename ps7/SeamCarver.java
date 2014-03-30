@@ -7,6 +7,10 @@ public class SeamCarver {
         this.picture = new Picture(picture);
     }
     
+    public Picture picture() {
+        return picture;
+    }
+    
     public int width() {
         return picture.width();
     }
@@ -24,7 +28,7 @@ public class SeamCarver {
             colorDiffSq(picture.get(x, y-1), picture.get(x, y+1));
     }
     
-    public double colorDiffSq(Color a, Color b) {
+    private double colorDiffSq(Color a, Color b) {
         return Math.pow(b.getRed() - a.getRed(), 2) + 
             Math.pow(b.getGreen() - a.getGreen(), 2) + 
             Math.pow(b.getBlue() - a.getBlue(), 2); 
@@ -123,25 +127,29 @@ public class SeamCarver {
                 if (y < a[x]) {
                     newPic.set(x, y, picture.get(x, y));
                 } else if (y > a[x]) {
-                    newPic.set(x, y, picture.get(x, y-1));
+                    newPic.set(x, y-1, picture.get(x, y));
                 }
             }
         }
+        
+        picture = newPic;
     }
     
     public void removeVerticalSeam(int[] a) {
         validateRange(a, height(), width()-1);
-        Picture newPic = new Picture(height(), width()-1);
+        Picture newPic = new Picture(width()-1, height());
         
         for (int x = 0; x < width(); x++) {
             for (int y = 0; y < height(); y++) {
                 if (x < a[y]) {
                     newPic.set(x, y, picture.get(x, y));
                 } else if (x > a[y]) {
-                    newPic.set(x, y, picture.get(x-1, y));
+                    newPic.set(x-1, y, picture.get(x, y));
                 }
             }
         }
+        
+        picture = newPic;
     }
     
     private void validateRange(int[] a, int expectedLen, int maxVal) {
