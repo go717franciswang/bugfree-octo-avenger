@@ -49,11 +49,10 @@ public class SeamCarver {
         for (int x = 0; x < width()-1; x++) {
             for (int y = 0; y < height(); y++) {
                 for (int i = -1; i <= 1; i++) {
-                    if (y+i > 0 && y+i < height()) {
+                    if (y+i >= 0 && y+i < height()) {
                         double e = pathTo[x][y] + energy(x+1, y+i);
                         
                         if (pathTo[x+1][y+i] == 0d || e < pathTo[x+1][y+i]) {
-                            //StdOut.print(".");
                             pathTo[x+1][y+i] = e;
                             edgeTo[x+1][y+i] = y;
                         }
@@ -72,11 +71,27 @@ public class SeamCarver {
             }
         }
         
+        /*
+        for (int y = 0; y < height(); y++) {
+            for (x = 0; x < width(); x++) {
+                StdOut.print("" + edgeTo[x][y] + " ");
+                //StdOut.print("" + pathTo[x][y] + " ");
+            }
+            StdOut.println("");
+        }
+        */
+        
         int[] a = new int[width()];
         a[width()-1] = ymin;
         for (x = width()-2; x >= 0; x--) {
             a[x] = edgeTo[x+1][a[x+1]];
         }
+       
+        /*
+        for (int i = 0; i < a.length; i++) {
+            StdOut.print(a[i] + " ");
+        }
+        */
         
         return a;
     }
@@ -92,17 +107,27 @@ public class SeamCarver {
         for (int y = 0; y < height()-1; y++) {
             for (int x = 0; x < width(); x++) {
                 for (int i = -1; i <= 1; i++) {
-                    if (x+i > 0 && x+i < width()) {
+                    if (x+i >= 0 && x+i < width()) {
                         double e = pathTo[x][y] + energy(x+i, y+1);
                         
                         if (pathTo[x+i][y+1] == 0d || e < pathTo[x+i][y+1]) {
                             pathTo[x+i][y+1] = e;
-                            edgeTo[x+i][y+1] = y;
+                            edgeTo[x+i][y+1] = x;
                         }
                     }
                 }
             }
         }
+        
+        /*
+        for (int y = 0; y < height(); y++) {
+            for (int x = 0; x < width(); x++) {
+                StdOut.print("" + edgeTo[x][y] + " ");
+                //StdOut.print("" + pathTo[x][y] + " ");
+            }
+            StdOut.println("");
+        }
+        */
         
         double minPath = -1d;
         int xmin = -1;
@@ -119,6 +144,12 @@ public class SeamCarver {
         for (y = height()-2; y >= 0; y--) {
             a[y] = edgeTo[a[y+1]][y+1];
         }
+        
+        /*
+        for (int i = 0; i < a.length; i++) {
+            StdOut.print(a[i] + " ");
+        }
+        */
         
         return a;
     }
@@ -159,16 +190,16 @@ public class SeamCarver {
     
     private void validateRange(int[] a, int expectedLen, int maxVal) {
         if (a.length != expectedLen) {
-            throw new java.lang.IllegalArgumentException();
+            throw new java.lang.IllegalArgumentException("Wrong length");
         }
         
         for (int i = 0; i < a.length; i++) {
             if (a[i] < 0 || a[i] > maxVal) {
-                throw new java.lang.IllegalArgumentException();
+                throw new java.lang.IllegalArgumentException("Out of bound");
             }
             
             if (i > 0 && Math.abs(a[i-1] - a[i]) > 1) {
-                throw new java.lang.IllegalArgumentException();
+                throw new java.lang.IllegalArgumentException("Not connected");
             }
         }
     }
