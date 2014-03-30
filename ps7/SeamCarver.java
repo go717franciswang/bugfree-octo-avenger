@@ -20,6 +20,10 @@ public class SeamCarver {
     }
     
     public double energy(int x, int y) {
+        if (x < 0 || x >= width() || y < 0 || y >= height()) {
+            throw new IndexOutOfBoundsException();
+        }
+        
         if (x == 0 || y == 0 || x == width()-1 || y == height()-1) {
             return 195075d;
         }
@@ -49,6 +53,7 @@ public class SeamCarver {
                         double e = pathTo[x][y] + energy(x+1, y+i);
                         
                         if (pathTo[x+1][y+i] == 0d || e < pathTo[x+1][y+i]) {
+                            //StdOut.print(".");
                             pathTo[x+1][y+i] = e;
                             edgeTo[x+1][y+i] = y;
                         }
@@ -61,7 +66,7 @@ public class SeamCarver {
         int ymin = -1;
         int x = width() - 1;
         for (int y = 0; y < height(); y++) {
-            if (minPath == -1d || minPath > pathTo[x][y]) {
+            if (y == 0 || minPath > pathTo[x][y]) {
                 minPath = pathTo[x][y];
                 ymin = y;
             }
@@ -103,7 +108,7 @@ public class SeamCarver {
         int xmin = -1;
         int y = height() - 1;
         for (int x = 0; x < width(); x++) {
-            if (minPath == -1d || minPath > pathTo[x][y]) {
+            if (x == 0 || minPath > pathTo[x][y]) {
                 minPath = pathTo[x][y];
                 xmin = x;
             }
