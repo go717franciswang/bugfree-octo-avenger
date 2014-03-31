@@ -2,9 +2,20 @@ import java.awt.Color;
 
 public class SeamCarver {
     private Picture picture;
+    private double[][] E;
     
     public SeamCarver(Picture picture) {
         this.picture = new Picture(picture);
+        buildE();
+    }
+    
+    private void buildE() {
+        E = new double[width()][height()];
+        for (int x = 0; x < width(); x++) {
+            for (int y = 0; y < height(); y++) {
+                E[x][y] = energy(x, y);
+            }
+        }
     }
     
     public Picture picture() {
@@ -43,14 +54,14 @@ public class SeamCarver {
         int[][] edgeTo = new int[width()][height()];
         
         for (int y = 0; y < height(); y++) {
-            pathTo[0][y] = energy(0, y);
+            pathTo[0][y] = E[0][y];
         }
         
         for (int x = 0; x < width()-1; x++) {
             for (int y = 0; y < height(); y++) {
                 for (int i = -1; i <= 1; i++) {
                     if (y+i >= 0 && y+i < height()) {
-                        double e = pathTo[x][y] + energy(x+1, y+i);
+                        double e = pathTo[x][y] + E[x+1][y+i];
                         
                         if (pathTo[x+1][y+i] == 0d || e < pathTo[x+1][y+i]) {
                             pathTo[x+1][y+i] = e;
@@ -71,27 +82,11 @@ public class SeamCarver {
             }
         }
         
-        /*
-        for (int y = 0; y < height(); y++) {
-            for (x = 0; x < width(); x++) {
-                StdOut.print("" + edgeTo[x][y] + " ");
-                //StdOut.print("" + pathTo[x][y] + " ");
-            }
-            StdOut.println("");
-        }
-        */
-        
         int[] a = new int[width()];
         a[width()-1] = ymin;
         for (x = width()-2; x >= 0; x--) {
             a[x] = edgeTo[x+1][a[x+1]];
         }
-       
-        /*
-        for (int i = 0; i < a.length; i++) {
-            StdOut.print(a[i] + " ");
-        }
-        */
         
         return a;
     }
@@ -101,14 +96,14 @@ public class SeamCarver {
         int[][] edgeTo = new int[width()][height()];
         
         for (int x = 0; x < width(); x++) {
-            pathTo[x][0] = energy(x, 0);
+            pathTo[x][0] = E[x][0];
         }
         
         for (int y = 0; y < height()-1; y++) {
             for (int x = 0; x < width(); x++) {
                 for (int i = -1; i <= 1; i++) {
                     if (x+i >= 0 && x+i < width()) {
-                        double e = pathTo[x][y] + energy(x+i, y+1);
+                        double e = pathTo[x][y] + E[x+i][y+1];
                         
                         if (pathTo[x+i][y+1] == 0d || e < pathTo[x+i][y+1]) {
                             pathTo[x+i][y+1] = e;
@@ -118,16 +113,6 @@ public class SeamCarver {
                 }
             }
         }
-        
-        /*
-        for (int y = 0; y < height(); y++) {
-            for (int x = 0; x < width(); x++) {
-                StdOut.print("" + edgeTo[x][y] + " ");
-                //StdOut.print("" + pathTo[x][y] + " ");
-            }
-            StdOut.println("");
-        }
-        */
         
         double minPath = -1d;
         int xmin = -1;
@@ -145,47 +130,69 @@ public class SeamCarver {
             a[y] = edgeTo[a[y+1]][y+1];
         }
         
-        /*
-        for (int i = 0; i < a.length; i++) {
-            StdOut.print(a[i] + " ");
-        }
-        */
-        
         return a;
     }
     
     public void removeHorizontalSeam(int[] a) {
         validateRange(a, width(), height()-1);
         Picture newPic = new Picture(width(), height()-1);
+        double[][] newE = new double[width()][height()-1];
         
         for (int x = 0; x < width(); x++) {
             for (int y = 0; y < height(); y++) {
                 if (y < a[x]) {
                     newPic.set(x, y, picture.get(x, y));
+                    newE[x][y] = E[x][y];
                 } else if (y > a[x]) {
                     newPic.set(x, y-1, picture.get(x, y));
+                    newE[x][y-1] = E[x][y];
                 }
             }
         }
         
         picture = newPic;
+        E = newE;
+        
+        for (int x = 0; x < width(); x++) {
+            if (a[x]-1 >= 0) {
+                E[x][a[x]-1] = energy(x, a[x]-1);
+            }
+            
+            if (a[x] < height()) {
+                E[x][a[x]] = energy(x, a[x]);
+            }
+        }
     }
     
     public void removeVerticalSeam(int[] a) {
         validateRange(a, height(), width()-1);
         Picture newPic = new Picture(width()-1, height());
+        double[][] newE = new double[width()-1][height()];
         
         for (int x = 0; x < width(); x++) {
             for (int y = 0; y < height(); y++) {
                 if (x < a[y]) {
                     newPic.set(x, y, picture.get(x, y));
+                    newE[x][y] = E[x][y];
                 } else if (x > a[y]) {
                     newPic.set(x-1, y, picture.get(x, y));
+                    newE[x-1][y] = E[x][y];
                 }
             }
         }
         
         picture = newPic;
+        E = newE;
+        
+        for (int y = 0; y < height(); y++) {
+            if (a[y]-1 >= 0) {
+                E[a[y]-1][y] = energy(a[y]-1, y);
+            }
+            
+            if (a[y] < width()) {
+                E[a[y]][y] = energy(a[y], y);
+            }
+        }
     }
     
     private void validateRange(int[] a, int expectedLen, int maxVal) {
