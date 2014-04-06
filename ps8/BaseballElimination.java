@@ -140,27 +140,40 @@ public class BaseballElimination {
     }
     
     public int wins(String team) {
+        validateTeam(team);
         return wins[team2id.get(team)];
     }
     
     public int losses(String team) {
+        validateTeam(team);
         return losses[team2id.get(team)];
     }
     
     public int remaining(String team) {
+        validateTeam(team);
         return remaining[team2id.get(team)];
     }
     
     public int against(String team1, String team2) {
+        validateTeam(team1);
+        validateTeam(team2);
         return against[team2id.get(team1)][team2id.get(team2)];
     }
     
     public boolean isEliminated(String team) {
+        validateTeam(team);
         return eliminated[team2id.get(team)];
     }
     
     public Iterable<String> certificateOfElimination(String team) {
+        validateTeam(team);
         return certificates[team2id.get(team)];
+    }
+    
+    private void validateTeam(String team) {
+        if (!team2id.containsKey(team)) {
+            throw new java.lang.IllegalArgumentException("Bad team");
+        }
     }
     
     public static void main(String[] args) {
