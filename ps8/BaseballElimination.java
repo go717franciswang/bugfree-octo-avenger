@@ -2,15 +2,108 @@ import java.util.Hashtable;
 import java.util.Arrays;
 
 public class BaseballElimination {
-    private final int numberOfTeams;
-    private final String[] teams;
-    private final Hashtable<String, Integer> team2id;
-    private final int[] wins;
-    private final int[] losses;
-    private final int[] remaining;
-    private final int[][] against;
+    private int numberOfTeams;
+    private String[] teams;
+    private Hashtable<String, Integer> team2id;
+    private int[] wins;
+    private int[] losses;
+    private int[] remaining;
+    private int[][] against;
+    private boolean[] eliminated;
+    private Bag<String>[] certificates;
+    private int leaderId;
     
     public BaseballElimination(String filename) {
+        loadFile(filename);
+        loadLeaderId();
+        
+        eliminated = new boolean[numberOfTeams];
+        certificates = (Bag<String>[]) new Bag[numberOfTeams];
+        
+        for (int teamId = 0; teamId < numberOfTeams; teamId++) {
+            if (wins[teamId] + remaining[teamId] < wins[leaderId]) {
+                eliminated[teamId] = true;
+                certificates[teamId] = new Bag<String>();
+                certificates[teamId].add(teams[leaderId]);
+                continue;
+            }
+            
+            int V = 2 + (numberOfTeams-1)*(numberOfTeams-2)/2 + (numberOfTeams-1);
+            int t = V - 1;
+            int s = V - 2;
+            int v0 = 0;
+            int v1 = (numberOfTeams-1)*(numberOfTeams-2)/2;
+            int fullCapacity = 0;
+            FlowNetwork G = new FlowNetwork(V);
+            for (int i = 0; i < numberOfTeams; i++) {
+                if (i == teamId) {
+                    continue;
+                }
+                
+                for (int j = i+1; j < numberOfTeams; j++) {
+                    if (j == teamId) {
+                        continue;
+                    }
+                    
+                    fullCapacity += against[i][j];
+                    FlowEdge e1 = new FlowEdge(s, v0, (double) against[i][j], 0d);
+                    FlowEdge e2 = new FlowEdge(v0, getTeamVertex(i, v1, teamId), 
+                                               Double.POSITIVE_INFINITY, 0d);
+                    FlowEdge e3 = new FlowEdge(v0, getTeamVertex(j, v1, teamId), 
+                                               Double.POSITIVE_INFINITY, 0d);
+                    G.addEdge(e1);
+                    G.addEdge(e2);
+                    G.addEdge(e3);
+                    v0++;
+                }
+                
+                FlowEdge e = 
+                    new FlowEdge(getTeamVertex(i, v1, teamId), 
+                                 t, 
+                                 (double) (wins[teamId]+remaining[teamId]-wins[i]),
+                                 0d);
+                G.addEdge(e);
+            }
+            
+            FordFulkerson ff = new FordFulkerson(G, s, t);
+            
+            if (ff.value() == fullCapacity) {
+                eliminated[teamId] = false;
+            } else {
+                eliminated[teamId] = true;
+                certificates[teamId] = new Bag<String>();
+                
+                for (int i = 0; i < numberOfTeams; i++) {
+                    if (i != teamId) {
+                        int v = getTeamVertex(i, v1, teamId);
+                        if (ff.inCut(v)) {
+                            certificates[teamId].add(teams[i]);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    private int getTeamVertex(int teamId, int base, int teamIdToEliminate) {
+        if (teamId < teamIdToEliminate) {
+            return base + teamId;
+        } else {
+            return base + teamId - 1;
+        }
+    }
+
+    private void loadLeaderId() {
+        int leadingWins = 0;
+        for (int teamId = 0; teamId < numberOfTeams; teamId++) {
+            if (wins[teamId] > leadingWins) {
+                leadingWins = wins[teamId];
+                leaderId = teamId;
+            }
+        }
+    }
+    
+    private void loadFile(String filename) {
         In in = new In(filename);
         numberOfTeams = in.readInt();
         teams = new String[numberOfTeams];
@@ -63,11 +156,11 @@ public class BaseballElimination {
     }
     
     public boolean isEliminated(String team) {
-        return false;
+        return eliminated[team2id.get(team)];
     }
     
     public Iterable<String> certificateOfElimination(String team) {
-        return new Queue<String>();
+        return certificates[team2id.get(team)];
     }
     
     public static void main(String[] args) {
