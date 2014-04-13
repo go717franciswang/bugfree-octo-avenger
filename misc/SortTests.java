@@ -2,7 +2,6 @@ import java.util.Arrays;
 
 public class SortTests {
     public static void LsdIntSort(int[] a, int w) {
-        w = 32;
         int radix = 2;
         int n = a.length;
         int[] aux = new int[n];
@@ -10,22 +9,21 @@ public class SortTests {
         int bit;
         for (int d = 0; d < w; d++) {         
             int[] count = new int[radix + 1];
-            for (int i = 0; i < n; i++)
-            {           
+            for (int i = 0; i < n; i++) {           
                 bit = (a[i] & (1 << d)) == 0 ? 0 : 1;           
                 count[bit + 1]++;
             }
-            for (int r = 0; r < radix; r++)
-            {
+            
+            for (int r = 0; r < radix; r++) {
                 count[r + 1] += count[r];
             }
-            for (int i = 0; i < n; i++)
-            {
+            
+            for (int i = 0; i < n; i++) {
                 bit = (a[i] & (1 << d)) == 0 ? 0 : 1;           
                 aux[count[bit]++] = a[i];
             }
-            for (int i = 0; i < n; i++)
-            {
+            
+            for (int i = 0; i < n; i++) {
                 a[i] = aux[i];
             }
         }
@@ -39,22 +37,21 @@ public class SortTests {
         int bit;
         for (int d = 0; d < w; d+=bits) {         
             int[] count = new int[radix+1];
-            for (int i = 0; i < n; i++)
-            {           
+            for (int i = 0; i < n; i++) {           
                 bit = (a[i] >> d) % radix;
                 count[bit + 1]++;
             }
-            for (int r = 0; r < radix; r++)
-            {
+            
+            for (int r = 0; r < radix; r++) {
                 count[r + 1] += count[r];
             }
-            for (int i = 0; i < n; i++)
-            {
+            
+            for (int i = 0; i < n; i++) {
                 bit = (a[i] >> d) % radix;
                 aux[count[bit]++] = a[i];
             }
-            for (int i = 0; i < n; i++)
-            {
+            
+            for (int i = 0; i < n; i++) {
                 a[i] = aux[i];
             }
         }
