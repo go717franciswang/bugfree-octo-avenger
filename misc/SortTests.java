@@ -31,6 +31,7 @@ public class SortTests {
     
     public static void LsdIntSort2(int[] a, int w, int bits) {
         int radix = (int) Math.pow(2, bits);
+        int mask = radix - 1;
         int n = a.length;
         int[] aux = new int[n];
         
@@ -38,7 +39,7 @@ public class SortTests {
         for (int d = 0; d < w; d+=bits) {         
             int[] count = new int[radix+1];
             for (int i = 0; i < n; i++) {           
-                bit = (a[i] >> d) % radix;
+                bit = (a[i] >> d) & mask;
                 count[bit + 1]++;
             }
             
@@ -47,7 +48,7 @@ public class SortTests {
             }
             
             for (int i = 0; i < n; i++) {
-                bit = (a[i] >> d) % radix;
+                bit = (a[i] >> d) & mask;
                 aux[count[bit]++] = a[i];
             }
             
