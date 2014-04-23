@@ -1,13 +1,13 @@
 public class BoggleSolver
 {
-    private TrieSET trie;
+    private TST<Boolean> trie;
     
     public BoggleSolver(String[] dictionary) {
-        trie = new TrieSET();
+        trie = new TST();
         for (int i = 0; i < dictionary.length; i++) {
             String word = dictionary[i];
             if (word.length() > 2) {
-                trie.add(word);
+                trie.put(word, true);
             }
         }
     }
@@ -17,7 +17,7 @@ public class BoggleSolver
     }
     
     public Iterable<String> getAllValidWords(BoggleBoard board) {
-        TrieSET validWords = new TrieSET();
+        TST<Boolean> validWords = new TST<Boolean>();
         boolean[][] discovered = new boolean[board.rows()][board.cols()];
         
         for (int i = 0; i < board.rows(); i++) {
@@ -27,19 +27,19 @@ public class BoggleSolver
             }
         }
         
-        return validWords;
+        return validWords.keys();
     }
     
     private void dfs(BoggleBoard board, int row, int col, StringBuilder chars,
-                     boolean[][] discovered, TrieSET validWords) {
+                     boolean[][] discovered, TST validWords) {
         discovered[row][col] = true;
         char letter = board.getLetter(row, col);
         addLetter(chars, letter);
         
         String word = chars.toString();
         if (isValidWord(word)) {
-            validWords.add(word);
-        } else if (!trie.keysWithPrefix(word).iterator().hasNext()) {
+            validWords.put(word, true);
+        } else if (!trie.prefixMatch(word).iterator().hasNext()) {
             removeLetter(chars, letter);
             discovered[row][col] = false;
             return;
