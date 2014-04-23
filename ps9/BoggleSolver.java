@@ -7,16 +7,77 @@ public class BoggleSolver
         for (int i = 0; i < dictionary.length; i++) {
             String word = dictionary[i];
             if (word.length() > 2) {
-                trie.add();
+                trie.add(word);
             }
         }
     }
     
+    private boolean isValidWord(String word) {
+        return trie.contains(word);
+    }
+    
     public Iterable<String> getAllValidWords(BoggleBoard board) {
+        Queue<String> validWords = new Queue<String>();
+        boolean[][] discovered = new boolean[board.rows()][board.cols()];
+        
+        for (int i = 0; i < board.rows(); i++) {
+            for (int j = 0; j < board.cols(); j++) {
+                StringBuilder chars = new StringBuilder();
+                dfs(board, i, j, chars, discovered, validWords);
+            }
+        }
+        
+        return validWords;
+    }
+    
+    private void dfs(BoggleBoard board, int row, int col, StringBuilder chars,
+                     boolean[][] discovered, Queue<String> validWords) {
+        discovered[row][col] = true;
+        char letter = board.getLetter(row, col);
+        addLetter(chars, letter);
+        
+        String word = chars.toString();
+        if (isValidWord(word)) {
+            validWords.enqueue(word);
+        } else if (!trie.keysWithPrefix(word).iterator().hasNext()) {
+            removeLetter(chars, letter);
+            discovered[row][col] = false;
+            return;
+        }
+        
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                int r = row - i;
+                int c = col - j;
+                if (discovered[r][c] || r < 0 || c < 0 || 
+                    r >= board.rows() || c >= board.cols()) {
+                    continue;
+                }
+                
+                dfs(board, r, c, chars, discovered, validWords);
+            }
+        }
+        
+        removeLetter(chars, letter);
+        discovered[row][col] = false;
+    }
+    
+    private void addLetter(StringBuilder chars, char letter) {
+        chars.append(letter);
+        if (letter == 'Q') {
+            chars.append('U');
+        }
+    }
+    
+    private void removeLetter(StringBuilder chars, char letter) {
+        chars.deleteCharAt(chars.length() - 1);
+        if (letter == 'Q') {
+            chars.deleteCharAt(chars.length() - 1);
+        }
     }
     
     public int scoreOf(String word) {
-        if (!trie.contains(word)) {
+        if (!isValidWord(word)) {
             return 0;
         }
         
