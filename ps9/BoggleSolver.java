@@ -17,7 +17,7 @@ public class BoggleSolver
     }
     
     public Iterable<String> getAllValidWords(BoggleBoard board) {
-        Queue<String> validWords = new Queue<String>();
+        TrieSET validWords = new TrieSET();
         boolean[][] discovered = new boolean[board.rows()][board.cols()];
         
         for (int i = 0; i < board.rows(); i++) {
@@ -31,14 +31,14 @@ public class BoggleSolver
     }
     
     private void dfs(BoggleBoard board, int row, int col, StringBuilder chars,
-                     boolean[][] discovered, Queue<String> validWords) {
+                     boolean[][] discovered, TrieSET validWords) {
         discovered[row][col] = true;
         char letter = board.getLetter(row, col);
         addLetter(chars, letter);
         
         String word = chars.toString();
         if (isValidWord(word)) {
-            validWords.enqueue(word);
+            validWords.add(word);
         } else if (!trie.keysWithPrefix(word).iterator().hasNext()) {
             removeLetter(chars, letter);
             discovered[row][col] = false;
@@ -49,8 +49,8 @@ public class BoggleSolver
             for (int j = -1; j <= 1; j++) {
                 int r = row - i;
                 int c = col - j;
-                if (discovered[r][c] || r < 0 || c < 0 || 
-                    r >= board.rows() || c >= board.cols()) {
+                if (r < 0 || c < 0 || r >= board.rows() || c >= board.cols() || 
+                    discovered[r][c]) {
                     continue;
                 }
                 
@@ -111,7 +111,7 @@ public class BoggleSolver
         int score = 0;
         for (String word : solver.getAllValidWords(board))
         {
-            StdOut.println(word);
+            StdOut.println(word + " " + solver.scoreOf(word));
             score += solver.scoreOf(word);
         }
         StdOut.println("Score = " + score);
