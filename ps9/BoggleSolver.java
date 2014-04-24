@@ -25,28 +25,31 @@ public class BoggleSolver
         for (int i = 0; i < board.rows(); i++) {
             for (int j = 0; j < board.cols(); j++) {
                 StringBuilder chars = new StringBuilder();
-                dfs(board, i, j, chars, discovered, validWords);
+                dfs(board, i, j, chars, trie.root, 0, discovered, validWords);
             }
         }
-        
         return validWords;
     }
     
-    private void dfs(BoggleBoard board, int row, int col, StringBuilder chars,
+    private void dfs(BoggleBoard board, int row, int col, StringBuilder chars, TST<Boolean>.Node node, int d,
                      boolean[][] discovered, HashSet<String> validWords) {
         discovered[row][col] = true;
         char letter = board.getLetter(row, col);
         addLetter(chars, letter);
         
         String word = chars.toString();
-        if (isValidWord(word)) {
-            validWords.add(word);
-        } else if (!trie.prefixExist(word)) {
+        
+        TST<Boolean>.Node x = trie.get(node, word, d);
+        if (x == null) {
             removeLetter(chars, letter);
             discovered[row][col] = false;
             return;
         }
         
+        if (x.val != null) {
+            validWords.add(word);
+        }
+
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
                 int r = row - i;
@@ -56,7 +59,11 @@ public class BoggleSolver
                     continue;
                 }
                 
-                dfs(board, r, c, chars, discovered, validWords);
+                if (letter == 'Q') {
+                    dfs(board, r, c, chars, x, d + 2, discovered, validWords);
+                } else {
+                    dfs(board, r, c, chars, x, d + 1, discovered, validWords);
+                }
             }
         }
         
@@ -118,6 +125,7 @@ public class BoggleSolver
         }
         StdOut.println("Score = " + score);
         
+        
         double startTime = System.currentTimeMillis();
         int iters = 0;
         while (true) {
@@ -131,5 +139,7 @@ public class BoggleSolver
         }
         
         StdOut.println("Solved " + iters + " in 1 second");
+        
+        
     }
 }
