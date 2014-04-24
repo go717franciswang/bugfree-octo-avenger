@@ -115,5 +115,19 @@ public class BoggleSolver
             score += solver.scoreOf(word);
         }
         StdOut.println("Score = " + score);
+        
+        double startTime = System.currentTimeMillis();
+        int iters = 0;
+        while (true) {
+            BoggleBoard b = new BoggleBoard();
+            solver.getAllValidWords(b);
+            iters++;
+            double endTime = System.currentTimeMillis();
+            if (endTime - startTime > 1000) {
+                break;
+            }
+        }
+        
+        StdOut.println("Solved " + iters + " in 1 second");
     }
 }
