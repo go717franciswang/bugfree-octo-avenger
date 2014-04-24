@@ -60,9 +60,9 @@ public class BoggleSolver
                 }
                 
                 if (letter == 'Q') {
-                    dfs(board, r, c, chars, x, d + 2, discovered, validWords);
+                    dfs(board, r, c, chars, x.mid, d + 2, discovered, validWords);
                 } else {
-                    dfs(board, r, c, chars, x, d + 1, discovered, validWords);
+                    dfs(board, r, c, chars, x.mid, d + 1, discovered, validWords);
                 }
             }
         }
@@ -120,11 +120,9 @@ public class BoggleSolver
         int score = 0;
         for (String word : solver.getAllValidWords(board))
         {
-            StdOut.println(word + " " + solver.scoreOf(word));
             score += solver.scoreOf(word);
         }
         StdOut.println("Score = " + score);
-        
         
         double startTime = System.currentTimeMillis();
         int iters = 0;
@@ -137,9 +135,6 @@ public class BoggleSolver
                 break;
             }
         }
-        
         StdOut.println("Solved " + iters + " in 1 second");
-        
-        
     }
 }

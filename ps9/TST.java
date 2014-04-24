@@ -33,7 +33,7 @@ public class TST<Value> {
 
     public class Node {
         public char c;                 // character
-        private Node left, mid, right;  // left, middle, and right subtries
+        public Node left, mid, right;  // left, middle, and right subtries
         public Value val;              // value associated with string
     }
 
