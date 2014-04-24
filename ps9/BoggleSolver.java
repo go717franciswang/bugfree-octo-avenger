@@ -41,7 +41,7 @@ public class BoggleSolver
         String word = chars.toString();
         if (isValidWord(word)) {
             validWords.add(word);
-        } else if (!trie.prefixMatch(word).iterator().hasNext()) {
+        } else if (!trie.prefixExist(word)) {
             removeLetter(chars, letter);
             discovered[row][col] = false;
             return;
