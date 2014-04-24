@@ -1,9 +1,11 @@
+import java.util.HashSet;
+
 public class BoggleSolver
 {
     private TST<Boolean> trie;
     
     public BoggleSolver(String[] dictionary) {
-        trie = new TST();
+        trie = new TST<Boolean>();
         for (int i = 0; i < dictionary.length; i++) {
             String word = dictionary[i];
             if (word.length() > 2) {
@@ -17,7 +19,7 @@ public class BoggleSolver
     }
     
     public Iterable<String> getAllValidWords(BoggleBoard board) {
-        TST<Boolean> validWords = new TST<Boolean>();
+        HashSet<String> validWords = new HashSet<String>();
         boolean[][] discovered = new boolean[board.rows()][board.cols()];
         
         for (int i = 0; i < board.rows(); i++) {
@@ -27,18 +29,18 @@ public class BoggleSolver
             }
         }
         
-        return validWords.keys();
+        return validWords;
     }
     
     private void dfs(BoggleBoard board, int row, int col, StringBuilder chars,
-                     boolean[][] discovered, TST validWords) {
+                     boolean[][] discovered, HashSet<String> validWords) {
         discovered[row][col] = true;
         char letter = board.getLetter(row, col);
         addLetter(chars, letter);
         
         String word = chars.toString();
         if (isValidWord(word)) {
-            validWords.put(word, true);
+            validWords.add(word);
         } else if (!trie.prefixMatch(word).iterator().hasNext()) {
             removeLetter(chars, letter);
             discovered[row][col] = false;
